@@ -1,0 +1,78 @@
+<div class="m-container mat-elevation-z8">
+  <div class="m-option" *ngIf="listTbData && selection.selected.length > 0">
+    <div padding-start *ngFor="let item of listTbData.listButton">
+      <button mat-flat-button [color]="item.color" (click)="onClickBtn(item)">
+        {{ item.name }}
+      </button>
+    </div>
+  </div>
+  <table *ngIf="dataSource" [dataSource]="dataSource || []" mat-table matSort>
+    <!-- Checkbox Column -->
+    <ng-container
+      matColumnDef="id"
+      style="padding-right: 8px !important; text-align: center"
+      *ngIf="hasCheckBox"
+    >
+      <th mat-header-cell *matHeaderCellDef style="text-align: center">
+        <mat-checkbox
+          (change)="$event ? masterToggle() : null"
+          [checked]="selection.hasValue() && isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()"
+          [aria-label]="checkboxLabel()"
+        >
+        </mat-checkbox>
+      </th>
+      <td mat-cell *matCellDef="let row" style="text-align: center">
+        <mat-checkbox
+          (click)="$event.stopPropagation()"
+          (change)="$event ? selection.toggle(row) : null"
+          [checked]="selection.isSelected(row)"
+          [aria-label]="checkboxLabel(row)"
+        >
+        </mat-checkbox>
+      </td>
+      <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container
+      *ngFor="let item of displayedColumnsAll; let i = index"
+      [matColumnDef]="item.cell"
+    >
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>{{ item.name }}</th>
+      <td tappable mat-cell *matCellDef="let row">
+        <!-- Gihug thêm phần click cell cho table -->
+        <div style="text-align: left" (click)="onClickCell(row, item.cell)" *ngIf="item.type == 'string'">
+          {{ row[item.cell] | numberConvert }}
+        </div>
+        <div style="text-align: right" (click)="onClickCell(row, item.cell)" *ngIf="item.type == 'number'">
+          {{ row[item.cell] | numberConvert }}
+        </div>
+        <div style="text-align: center" *ngIf="item.type == 'date'" (click)="onClickCell(row, item.cell)">
+          {{ row[item.cell] | date: "dd/MM/yyyy" }}
+        </div>
+        <!-- Nút sửa -->
+        <div
+          *ngIf="item.cell === 'undefine'"
+          (click)="onClickEdit(row)"
+          style="text-align: left"
+        >
+          <button mat-raised-button color="accent">
+            <mat-icon>edit</mat-icon>Sửa
+          </button>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
+<mat-paginator
+  *ngIf="hasPagination"
+  [length]="collectionSize"
+  [pageSize]="itemPerPage"
+  [pageSizeOptions]="pageSizeOptions"
+  (page)="onClickPagination($event)"
+  [pageIndex]="page - 1"
+></mat-paginator>

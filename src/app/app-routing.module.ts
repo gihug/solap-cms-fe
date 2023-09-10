@@ -13,7 +13,11 @@ const routes: Routes = [
         component: CustomerComponent
       }
     ]
-  }
+  },
+  {
+    path: '**',
+    component: CustomerComponent,
+  },
 ];
 
 @NgModule({
